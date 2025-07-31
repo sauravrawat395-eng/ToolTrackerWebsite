@@ -1,4 +1,5 @@
-const apiUrl = "<https://n4hswbm4v6.execute-api.us-east-1.amazonaws.com/test>";
+const apiUrl = "<https://n4hswbm4v6.execute-api.us-east-1.amazonaws.com/prod>";
+
 fetch(apiUrl)
   .then(response => response.json())
   .then(data => {
