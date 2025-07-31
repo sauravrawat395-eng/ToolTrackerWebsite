@@ -1,4 +1,4 @@
-const apiUrl = "<https://n4hswbm4v6.execute-api.us-east-1.amazonaws.com/prod>";
+const apiUrl = "<https://n4hswbm4v6.execute-api.us-east-1.amazonaws.com/prod/getToolData>";
 fetch(apiUrl)
   .then(response => response.json())
   .then(data => {
