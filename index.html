@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -6,39 +6,21 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="container">
-        <aside class="sidebar">
-            <h2>Tool Tracker</h2>
-            <nav>
-                <ul>
-                    <li><a href="#">Dashboard</a></li>
-                    <li><a href="#">Tools</a></li>
-                    <li><a href="#">Users</a></li>
-                    <li><a href="#">Reports</a></li>
-                    <li><a href="#">Settings</a></li>
-                </ul>
-            </nav>
-        </aside>
+    <h1>Tool Tracker Dashboard</h1>
+    <table id="toolTable">
+        <thead>
+            <tr>
+                <th>User Name</th>
+                <th>User ID</th>
+                <th>Tool Name</th>
+                <th>Tool ID</th>
+                <th>Available</th>
+                <th>Time</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
 
-        <main class="main-content">
-            <h1>Tool Tracker Dashboard</h1>
-            <div class="table-container">
-                <table id="toolTable">
-                    <thead>
-                        <tr>
-                            <th>User Name</th>
-                            <th>User ID</th>
-                            <th>Tool Name</th>
-                            <th>Tool ID</th>
-                            <th>Available</th>
-                            <th>Time</th>
-                        </tr>
-                    </thead>
-                    <tbody></tbody>
-                </table>
-            </div>
-        </main>
-    </div>
     <script src="script.js"></script>
 </body>
-</html>
+</html>  
