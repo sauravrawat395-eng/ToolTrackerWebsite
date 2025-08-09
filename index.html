@@ -148,30 +148,35 @@
         });
     }
 
-    function fetchToolDetails() {
-        const toolId = document.getElementById("toolIdInput").value.trim();
-        if(!toolId) {
-            alert("Please enter Tool ID");
-            return;
-        }
-
-        // Replace with your actual Tool API URL
-        const toolApiUrl = `https://08mjycfgoj.execute-api.us-east-1.amazonaws.com/prod/IndividualToolDetail=${encodeURIComponent(toolId)}`;
-
-        fetch(toolApiUrl)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error("Tool not found");
-            }
-            return response.json();
-        })
-        .then(data => {
-            displayDetails("Tool Details", data);
-        })
-        .catch(error => {
-            alert(error.message);
-        });
+   function fetchToolDetails() {
+    const toolId = document.getElementById("toolIdInput").value.trim();
+    if (!toolId) {
+        alert("Please enter Tool ID");
+        return;
     }
+
+    const toolApiUrl = "https://08mjycfgoj.execute-api.us-east-1.amazonaws.com/prod/IndividualToolDetail";
+
+    fetch(toolApiUrl, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ toolId: toolId })
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error("Tool not found");
+        }
+        return response.json();
+    })
+    .then(data => {
+        displayDetails("Tool Details", data);
+    })
+    .catch(error => {
+        alert(error.message);
+    });
+}
 
     function displayDetails(title, data) {
         detailsBox.innerHTML = `<h3>${title}</h3>` +
@@ -182,3 +187,4 @@
 
 </body>
 </html>
+
