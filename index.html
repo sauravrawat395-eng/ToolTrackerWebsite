@@ -2,197 +2,129 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Dashboard</title>
+<title>Tool Tracker Dashboard</title>
 <style>
     body {
         font-family: Arial, sans-serif;
-        background-color: #f4f6f9;
+        background: #f5f6fa;
         display: flex;
-        justify-content: center;
+        flex-direction: column;
         align-items: center;
+        justify-content: center;
         height: 100vh;
         margin: 0;
     }
-
-    .container {
-        text-align: center;
+    h1 {
+        margin-bottom: 30px;
+        color: #2f3640;
     }
-
-    .block-container {
+    .role-container {
         display: flex;
-        gap: 30px;
-        margin-bottom: 20px;
+        gap: 20px;
     }
-
-    .block {
-        background-color: white;
-        padding: 40px;
+    .role-card {
+        width: 200px;
+        height: 150px;
+        background: white;
         border-radius: 12px;
-        box-shadow: 0px 4px 10px rgba(0,0,0,0.1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
         cursor: pointer;
-        font-size: 20px;
+        font-size: 1.3em;
         font-weight: bold;
-        width: 150px;
-        text-align: center;
-        transition: transform 0.2s ease-in-out;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
     }
-
-    .block:hover {
-        transform: scale(1.05);
-        background-color: #eef2f7;
+    .role-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 6px 12px rgba(0,0,0,0.3);
     }
-
-    .input-area {
+    #empForm {
         display: none;
+        flex-direction: column;
+        gap: 10px;
         margin-top: 20px;
     }
-
     input {
         padding: 10px;
-        font-size: 16px;
-        width: 200px;
+        font-size: 1em;
         border: 1px solid #ccc;
         border-radius: 6px;
     }
-
     button {
-        padding: 10px 20px;
-        font-size: 16px;
-        background-color: #4CAF50;
-        color: white;
+        padding: 10px;
+        font-size: 1em;
         border: none;
+        background: #273c75;
+        color: white;
         border-radius: 6px;
-        margin-left: 10px;
         cursor: pointer;
     }
-
     button:hover {
-        background-color: #45a049;
-    }
-
-    .details {
-        background: #fff;
-        padding: 15px;
-        border-radius: 8px;
-        margin-top: 20px;
-        text-align: left;
-        display: none;
-        box-shadow: 0px 4px 10px rgba(0,0,0,0.1);
-        width: 350px;
-        margin-left: auto;
-        margin-right: auto;
+        background: #40739e;
     }
 </style>
 </head>
 <body>
 
-<div class="container">
-    <div class="block-container">
-        <div class="block" id="userBlock">User</div>
-        <div class="block" id="toolBlock">Tool</div>
-        <div class="block" id="adminBlock">Admin</div>
-    </div>
+<h1>Select Role</h1>
+<div class="role-container">
+    <div class="role-card" onclick="selectRole('user')">User</div>
+    <div class="role-card" onclick="selectRole('admin')">Admin</div>
+</div>
 
-    <!-- Employee Input -->
-    <div class="input-area" id="userInputArea">
-        <input type="text" id="empIdInput" placeholder="Enter Employee ID">
-        <button onclick="fetchEmployeeDetails()">Submit</button>
-    </div>
-
-    <!-- Tool Input -->
-    <div class="input-area" id="toolInputArea">
-        <input type="text" id="toolIdInput" placeholder="Enter Tool ID">
-        <button onclick="fetchToolDetails()">Submit</button>
-    </div>
-
-    <!-- Output -->
-    <div class="details" id="detailsBox"></div>
+<div id="empForm">
+    <input type="text" id="empId" placeholder="Enter Employee ID">
+    <button onclick="checkEmpId()">Submit</button>
 </div>
 
 <script>
-    const detailsBox = document.getElementById("detailsBox");
+    let selectedRole = null;
+    const apiUrl = "YOUR_POST_API_ENDPOINT"; // replace with your AWS API Gateway POST URL
 
-    document.getElementById("userBlock").addEventListener("click", function(){
-        document.getElementById("userInputArea").style.display = "block";
-        document.getElementById("toolInputArea").style.display = "none";
-        detailsBox.style.display = "none";
-    });
+    function selectRole(role) {
+        selectedRole = role;
+        document.getElementById("empForm").style.display = "flex";
+    }
 
-    document.getElementById("toolBlock").addEventListener("click", function(){
-        document.getElementById("toolInputArea").style.display = "block";
-        document.getElementById("userInputArea").style.display = "none";
-        detailsBox.style.display = "none";
-    });
-
-    function fetchEmployeeDetails() {
-        const empId = document.getElementById("empIdInput").value.trim();
-        if(!empId) {
+    async function checkEmpId() {
+        const empId = document.getElementById("empId").value.trim();
+        if (!empId) {
             alert("Please enter Employee ID");
             return;
         }
 
-        const apiUrl = `https://rkjbamtq2j.execute-api.us-east-1.amazonaws.com/IndividualEmployeeToolDetail?empId=${encodeURIComponent(empId)}`;
+        try {
+            const res = await fetch(apiUrl, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ empId })
+            });
+            const data = await res.json();
 
-        fetch(apiUrl)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error("Employee not found");
+            if (!data || Object.keys(data).length === 0) {
+                alert("Employee not found");
+                return;
             }
-            return response.json();
-        })
-        .then(data => {
-            displayDetails("Employee Details", data);
-        })
-        .catch(error => {
-            alert(error.message);
-        });
-    }
 
-   function fetchToolDetails() {
-    const toolId = document.getElementById("toolIdInput").value.trim();
-    if (!toolId) {
-        alert("Please enter Tool ID");
-        return;
-    }
-
-    const toolApiUrl = "https://08mjycfgoj.execute-api.us-east-1.amazonaws.com/prod/IndividualToolDetail";
-
-    fetch(toolApiUrl, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ toolId: toolId })
-    })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error("Tool not found");
+            if (selectedRole === "user") {
+                // open user details page in new tab
+                window.open(`user.html?empId=${empId}`, "_blank");
+            } else if (selectedRole === "admin") {
+                if (data.role === 1) {
+                    // open admin dashboard
+                    window.open(`admin.html?empId=${empId}`, "_blank");
+                } else {
+                    alert("You are not authorized as Admin");
+                }
+            }
+        } catch (err) {
+            console.error(err);
+            alert("Error checking Employee ID");
         }
-        return response.json();
-    })
-    .then(data => {
-        displayDetails("Tool Details", data);
-    })
-    .catch(error => {
-        alert(error.message);
-    });
-}
-
-   function displayDetails(title, data) {
-    detailsBox.innerHTML = `<h3>${title}</h3>` +
-        Object.entries(data).map(([key, value]) => {
-            if (typeof value === "object" && value !== null) {
-                return `<p><b>${key}:</b> <pre>${JSON.stringify(value, null, 2)}</pre></p>`;
-            } else {
-                return `<p><b>${key}:</b> ${value}</p>`;
-            }
-        }).join("");
-    detailsBox.style.display = "block";
-}
-
+    }
 </script>
 
 </body>
 </html>
-
-
