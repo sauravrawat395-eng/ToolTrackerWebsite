@@ -178,13 +178,21 @@
     });
 }
 
-    function displayDetails(title, data) {
-        detailsBox.innerHTML = `<h3>${title}</h3>` +
-            Object.entries(data).map(([key, value]) => `<p><b>${key}:</b> ${value}</p>`).join("");
-        detailsBox.style.display = "block";
-    }
+   function displayDetails(title, data) {
+    detailsBox.innerHTML = `<h3>${title}</h3>` +
+        Object.entries(data).map(([key, value]) => {
+            if (typeof value === "object" && value !== null) {
+                return `<p><b>${key}:</b> <pre>${JSON.stringify(value, null, 2)}</pre></p>`;
+            } else {
+                return `<p><b>${key}:</b> ${value}</p>`;
+            }
+        }).join("");
+    detailsBox.style.display = "block";
+}
+
 </script>
 
 </body>
 </html>
+
 
