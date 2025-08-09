@@ -42,7 +42,7 @@
         background-color: #eef2f7;
     }
 
-    #userInputArea {
+    .input-area {
         display: none;
         margin-top: 20px;
     }
@@ -89,21 +89,39 @@
 <div class="container">
     <div class="block-container">
         <div class="block" id="userBlock">User</div>
+        <div class="block" id="toolBlock">Tool</div>
         <div class="block" id="adminBlock">Admin</div>
     </div>
 
-    <div id="userInputArea">
+    <!-- Employee Input -->
+    <div class="input-area" id="userInputArea">
         <input type="text" id="empIdInput" placeholder="Enter Employee ID">
         <button onclick="fetchEmployeeDetails()">Submit</button>
     </div>
 
-    <div class="details" id="employeeDetails"></div>
+    <!-- Tool Input -->
+    <div class="input-area" id="toolInputArea">
+        <input type="text" id="toolIdInput" placeholder="Enter Tool ID">
+        <button onclick="fetchToolDetails()">Submit</button>
+    </div>
+
+    <!-- Output -->
+    <div class="details" id="detailsBox"></div>
 </div>
 
 <script>
+    const detailsBox = document.getElementById("detailsBox");
+
     document.getElementById("userBlock").addEventListener("click", function(){
         document.getElementById("userInputArea").style.display = "block";
-        document.getElementById("employeeDetails").style.display = "none";
+        document.getElementById("toolInputArea").style.display = "none";
+        detailsBox.style.display = "none";
+    });
+
+    document.getElementById("toolBlock").addEventListener("click", function(){
+        document.getElementById("toolInputArea").style.display = "block";
+        document.getElementById("userInputArea").style.display = "none";
+        detailsBox.style.display = "none";
     });
 
     function fetchEmployeeDetails() {
@@ -123,14 +141,42 @@
             return response.json();
         })
         .then(data => {
-            const detailsDiv = document.getElementById("employeeDetails");
-            detailsDiv.innerHTML = "<h3>Employee Details</h3>" + 
-                Object.entries(data).map(([key, value]) => `<p><b>${key}:</b> ${value}</p>`).join("");
-            detailsDiv.style.display = "block";
+            displayDetails("Employee Details", data);
         })
         .catch(error => {
             alert(error.message);
         });
+    }
+
+    function fetchToolDetails() {
+        const toolId = document.getElementById("toolIdInput").value.trim();
+        if(!toolId) {
+            alert("Please enter Tool ID");
+            return;
+        }
+
+        // Replace with your actual Tool API URL
+        const toolApiUrl = `https://08mjycfgoj.execute-api.us-east-1.amazonaws.com/prod/IndividualToolDetail=${encodeURIComponent(toolId)}`;
+
+        fetch(toolApiUrl)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error("Tool not found");
+            }
+            return response.json();
+        })
+        .then(data => {
+            displayDetails("Tool Details", data);
+        })
+        .catch(error => {
+            alert(error.message);
+        });
+    }
+
+    function displayDetails(title, data) {
+        detailsBox.innerHTML = `<h3>${title}</h3>` +
+            Object.entries(data).map(([key, value]) => `<p><b>${key}:</b> ${value}</p>`).join("");
+        detailsBox.style.display = "block";
     }
 </script>
 
