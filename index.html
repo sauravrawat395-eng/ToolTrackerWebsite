@@ -1,33 +1,129 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>User Details</title>
-    <style>
-        body { font-family: Arial; padding: 20px; }
-        h1 { color: #3498db; }
-        .details { margin-top: 20px; padding: 15px; border: 1px solid #ccc; border-radius: 8px; }
-    </style>
+<meta charset="UTF-8">
+<title>Tool Tracker Dashboard</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background: #f5f6fa;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        margin: 0;
+    }
+    h1 {
+        margin-bottom: 30px;
+        color: #2f3640;
+    }
+    .role-container {
+        display: flex;
+        gap: 20px;
+    }
+    .role-card {
+        width: 200px;
+        height: 150px;
+        background: white;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        font-size: 1.3em;
+        font-weight: bold;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .role-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+    }
+    #empForm {
+        display: none;
+        flex-direction: column;
+        gap: 10px;
+        margin-top: 20px;
+    }
+    input {
+        padding: 10px;
+        font-size: 1em;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+    }
+    button {
+        padding: 10px;
+        font-size: 1em;
+        border: none;
+        background: #273c75;
+        color: white;
+        border-radius: 6px;
+        cursor: pointer;
+    }
+    button:hover {
+        background: #40739e;
+    }
+</style>
 </head>
 <body>
 
-<h1>User Details</h1>
-<div id="userDetails" class="details"></div>
+<h1>Select Role</h1>
+<div class="role-container">
+    <div class="role-card" onclick="selectRole('user')">User</div>
+    <div class="role-card" onclick="selectRole('admin')">Admin</div>
+</div>
+
+<div id="empForm">
+    <input type="text" id="empId" placeholder="Enter Employee ID">
+    <button onclick="checkEmpId()">Submit</button>
+</div>
 
 <script>
-document.addEventListener("DOMContentLoaded", () => {
-    const userData = JSON.parse(localStorage.getItem("userData"));
-    if (!userData) {
-        document.getElementById("userDetails").innerHTML = "<p>No data found.</p>";
-        return;
+    let selectedRole = null;
+    const apiUrl = "YOUR_POST_API_ENDPOINT"; // replace with your AWS API Gateway POST URL
+
+    function selectRole(role) {
+        selectedRole = role;
+        document.getElementById("empForm").style.display = "flex";
     }
-    document.getElementById("userDetails").innerHTML = `
-        <p><b>Employee ID:</b> ${userData.empId}</p>
-        <p><b>Name:</b> ${userData.empName}</p>
-        <p><b>Email:</b> ${userData.email}</p>
-        <p><b>Role:</b> ${userData.role}</p>
-    `;
-});
+
+    async function checkEmpId() {
+        const empId = document.getElementById("empId").value.trim();
+        if (!empId) {
+            alert("Please enter Employee ID");
+            return;
+        }
+
+        try {
+            const res = await fetch(apiUrl, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ empId })
+            });
+            const data = await res.json();
+
+            if (!data || Object.keys(data).length === 0) {
+                alert("Employee not found");
+                return;
+            }
+
+            if (selectedRole === "user") {
+                // open user details page in new tab
+                window.open(`user.html?empId=${empId}`, "_blank");
+            } else if (selectedRole === "admin") {
+                if (data.role === 1) {
+                    // open admin dashboard
+                    window.open(`admin.html?empId=${empId}`, "_blank");
+                } else {
+                    alert("You are not authorized as Admin");
+                }
+            }
+        } catch (err) {
+            console.error(err);
+            alert("Error checking Employee ID");
+        }
+    }
 </script>
 
 </body>
