@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>User Portal</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="container">
+    <h2>User Login</h2>
+    <input type="text" id="empIdInput" placeholder="Enter Employee ID">
+    <button onclick="fetchUserDetails()">Submit</button>
+
+    <div class="details" id="userDetails"></div>
+</div>
+
+<script>
+function fetchUserDetails() {
+    const empId = document.getElementById("empIdInput").value.trim();
+    if (!empId) {
+        alert("Please enter Employee ID");
+        return;
+    }
+
+    const apiUrl = "https://rkjbamtq2j.execute-api.us-east-1.amazonaws.com/IndividualEmployeeToolDetail"; // POST API
+
+    fetch(apiUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ empId: empId })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (!data) throw new Error("User not found");
+        displayDetails(data);
+    })
+    .catch(err => alert(err.message));
+}
+
+function displayDetails(data) {
+    const detailsBox = document.getElementById("userDetails");
+    detailsBox.innerHTML = "<h3>User Details</h3>" +
+        Object.entries(data).map(([k, v]) => `<p><b>${k}:</b> ${v}</p>`).join("");
+    detailsBox.style.display = "block";
+}
+</script>
+
+</body>
+</html>
