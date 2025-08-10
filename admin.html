@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Admin Portal</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="container">
+    <h2>Admin Login</h2>
+    <input type="text" id="empIdInput" placeholder="Enter Employee ID">
+    <button onclick="checkAdmin()">Submit</button>
+
+    <div class="details" id="adminDashboard" style="display:none;">
+        <h3>Admin Dashboard</h3>
+        <button onclick="location.href='addEmployee.html'">Add Employee</button>
+        <button onclick="location.href='addTool.html'">Add Tool</button>
+        <button onclick="location.href='allEmployees.html'">All Employee Details</button>
+        <button onclick="location.href='allTools.html'">All Tool Details</button>
+    </div>
+</div>
+
+<script>
+function checkAdmin() {
+    const empId = document.getElementById("empIdInput").value.trim();
+    if (!empId) {
+        alert("Please enter Employee ID");
+        return;
+    }
+
+    const apiUrl = "https://08mjycfgoj.execute-api.us-east-1.amazonaws.com/prod/IndividualToolDetail"; // POST API
+
+    fetch(apiUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ empId: empId })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.role !== 1) throw new Error("Not authorized as Admin");
+        document.getElementById("adminDashboard").style.display = "block";
+    })
+    .catch(err => alert(err.message));
+}
+</script>
+
+</body>
+</html>
